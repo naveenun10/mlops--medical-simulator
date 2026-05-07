@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Insurance Cost Prediction</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="mb-4">Insurance Cost Prediction</h2>
+        <form id="predictionForm">
+            <div class="form-group">
+                <label>Age:</label>
+                <input type="number" class="form-control" name="age" required>
+            </div>
+            <div class="form-group">
+                <label>Sex:</label>
+                <select class="form-control" name="sex" required>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>BMI:</label>
+                <input type="number" step="0.01" class="form-control" name="bmi" required>
+            </div>
+            <div class="form-group">
+                <label>Children:</label>
+                <input type="number" class="form-control" name="children" required>
+            </div>
+            <div class="form-group">
+                <label>Smoker:</label>
+                <select class="form-control" name="smoker" required>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Region:</label>
+                <select class="form-control" name="region" required>
+                    <option value="southwest">Southwest</option>
+                    <option value="southeast">Southeast</option>
+                    <option value="northwest">Northwest</option>
+                    <option value="northeast">Northeast</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Predict</button>
+        </form>
+        <div id="result" class="mt-4"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#predictionForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                // Get form data
+                var formData = {
+                    age: parseFloat($('input[name="age"]').val()),
+                    bmi: parseFloat($('input[name="bmi"]').val()),
+                    children: parseInt($('input[name="children"]').val()),
+                    sex: $('select[name="sex"]').val(),
+                    smoker: $('select[name="smoker"]').val(),
+                    region: $('select[name="region"]').val()
+                };
+                
+                // Validate inputs
+                if (isNaN(formData.age) || isNaN(formData.bmi) || isNaN(formData.children)) {
+                    $('#result').html('<div class="alert alert-danger">Please enter valid numbers</div>');
+                    return;
+                }
+                
+                $.ajax({
+                    url: '/predict',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    success: function(response) {
+                        console.log('Response:', response);  // Debug log
+                        $('#result').html(
+                            '<div class="alert alert-success">' +
+                            'Predicted Insurance Cost: $' + response.prediction.toFixed(2) +
+                            '</div>'
+                        );
+                    },
+                    error: function(error) {
+                        console.log('Error:', error);  // Debug log
+                        $('#result').html(
+                            '<div class="alert alert-danger">' +
+                            'Error: ' + (error.responseJSON ? error.responseJSON.error : 'Unknown error') +
+                            '</div>'
+                        );
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

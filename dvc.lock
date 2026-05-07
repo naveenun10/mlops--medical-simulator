@@ -1,0 +1,66 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python src/data_ingestion.py
+    deps:
+    - path: src/data_ingestion.py
+      md5: 5545d4924998aeb0bdbdadcf6427131f
+      size: 2518
+    outs:
+    - path: data/processed/test.csv
+      md5: 942d3d621b76f64278f4030510670352
+      size: 13169
+    - path: data/processed/train.csv
+      md5: ae7302abebcac5cbc7ec214d47372bea
+      size: 52343
+  data_preprocessing:
+    cmd: python src/data_preprocessing.py
+    deps:
+    - path: data/processed/test.csv
+      md5: 942d3d621b76f64278f4030510670352
+      size: 13169
+    - path: data/processed/train.csv
+      md5: ae7302abebcac5cbc7ec214d47372bea
+      size: 52343
+    - path: src/data_preprocessing.py
+      md5: 7b109d20d53be6d5dd10923e9f0bb35a
+      size: 3645
+    outs:
+    - path: data/transform/test.csv
+      md5: 8c6fc4b25c0578e99e3b331f18777999
+      size: 21607
+    - path: data/transform/train.csv
+      md5: fa217f9478cd24226fb7fa1715caaa47
+      size: 86110
+  model_training:
+    cmd: python src/model_training.py
+    deps:
+    - path: data/transform/test.csv
+      md5: 8c6fc4b25c0578e99e3b331f18777999
+      size: 21607
+    - path: data/transform/train.csv
+      md5: fa217f9478cd24226fb7fa1715caaa47
+      size: 86110
+    - path: src/model_training.py
+      md5: 0cc930f28cb2895da2a99d3dfe441cb9
+      size: 3063
+    outs:
+    - path: models/random_forest_model.pkl
+      md5: d9bd73d8ddbb78831e3794e5c9571686
+      size: 9730593
+  model_evaluation:
+    cmd: python src/model_evalaution.py
+    deps:
+    - path: data/transform/test.csv
+      md5: 8c6fc4b25c0578e99e3b331f18777999
+      size: 21607
+    - path: models/random_forest_model.pkl
+      md5: d9bd73d8ddbb78831e3794e5c9571686
+      size: 9730593
+    - path: src/model_evalaution.py
+      md5: 05bcd60d0b786e271858a16912e9963b
+      size: 3551
+    outs:
+    - path: reports/evaluation/metrics.txt
+      md5: 8cf3c6a5a2cc430e726f66bb7ce146da
+      size: 48
